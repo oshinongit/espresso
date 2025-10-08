@@ -12,7 +12,15 @@ impl PaintCanvas {
     #[wasm_bindgen(constructor)]
     pub fn new(width: u32, height: u32) -> PaintCanvas {
         let size = (width * height * 4) as usize;
-        let pixels = vec![255; size]; // Start with white background
+        let mut pixels = Vec::with_capacity(size);
+
+        // Initialize with coffee brown color (RGB: 101, 67, 33)
+        for _ in 0..(width * height) {
+            pixels.push(101); // R
+            pixels.push(67);  // G
+            pixels.push(33);  // B
+            pixels.push(255); // A
+        }
 
         PaintCanvas {
             width,
