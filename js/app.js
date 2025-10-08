@@ -167,4 +167,89 @@ canvas.addEventListener('touchend', (e) => {
 paintCanvas.clear(101, 67, 33); // Start with espresso brown
 renderCanvas();
 
+// ===== SHARING FUNCTIONALITY =====
+
+// Helper function to show toast notifications
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
+
+// Helper function to get canvas as blob
+function getCanvasBlob() {
+    return new Promise((resolve) => {
+        canvas.toBlob((blob) => {
+            resolve(blob);
+        }, 'image/png');
+    });
+}
+
+// Download PNG
+document.getElementById('download-btn').addEventListener('click', async () => {
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+    const filename = `latte-art-${timestamp}.png`;
+
+    const blob = await getCanvasBlob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = filename;
+    link.href = url;
+    link.click();
+    URL.revokeObjectURL(url);
+
+    showToast('✅ Downloaded your latte art!');
+});
+
+// Copy to clipboard
+document.getElementById('copy-btn').addEventListener('click', async () => {
+    try {
+        const blob = await getCanvasBlob();
+        await navigator.clipboard.write([
+            new ClipboardItem({ 'image/png': blob })
+        ]);
+        showToast('✅ Copied to clipboard!');
+    } catch (err) {
+        showToast('❌ Clipboard not supported');
+        console.error('Copy failed:', err);
+    }
+});
+
+// Native share (Web Share API)
+document.getElementById('share-btn').addEventListener('click', async () => {
+    if (!navigator.share) {
+        showToast('❌ Share not supported on this browser');
+        return;
+    }
+
+    try {
+        const blob = await getCanvasBlob();
+        const file = new File([blob], 'latte-art.png', { type: 'image/png' });
+
+        await navigator.share({
+            title: 'My Latte Art',
+            text: 'Check out my latte art creation! ☕✨',
+            files: [file]
+        });
+        showToast('✅ Shared successfully!');
+    } catch (err) {
+        if (err.name !== 'AbortError') {
+            showToast('❌ Share failed');
+            console.error('Share failed:', err);
+        }
+    }
+});
+
+// Share on Twitter
+document.getElementById('twitter-btn').addEventListener('click', () => {
+    const text = encodeURIComponent('Check out my latte art creation! ☕✨\n\nMade with Espresso Latte Art simulator');
+    const url = encodeURIComponent(window.location.href);
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+    window.open(twitterUrl, '_blank', 'width=550,height=420');
+    showToast('✅ Opening Twitter...');
+});
+
 console.log('☕ Espresso Latte Art loaded! WASM is ready.');

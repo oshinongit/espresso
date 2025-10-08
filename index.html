@@ -147,6 +147,88 @@
             border-color: #6B4423;
             border-width: 3px;
         }
+
+        .share-section {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .share-title {
+            color: #5D4037;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .share-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .share-btn.download {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .share-btn.copy {
+            background: #2196F3;
+            color: white;
+        }
+
+        .share-btn.share {
+            background: #FF9800;
+            color: white;
+        }
+
+        .share-btn.twitter {
+            background: #1DA1F2;
+            color: white;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
     </style>
 </head>
 <body>
@@ -176,6 +258,26 @@
     </div>
 
     <div class="status">WebAssembly-powered latte art simulator</div>
+
+    <div class="share-section">
+        <div class="share-title">Share Your Latte Art ☕</div>
+        <div class="share-buttons">
+            <button class="share-btn download" id="download-btn">
+                📥 Download PNG
+            </button>
+            <button class="share-btn copy" id="copy-btn">
+                📋 Copy Image
+            </button>
+            <button class="share-btn share" id="share-btn">
+                📱 Share
+            </button>
+            <button class="share-btn twitter" id="twitter-btn">
+                🐦 Share on Twitter
+            </button>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
 
     <script type="module" src="./js/app.js"></script>
 </body>
