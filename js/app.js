@@ -20,8 +20,10 @@ const clearBtn = document.getElementById('clear-btn');
 let isDrawing = false;
 let lastX = 0;
 let lastY = 0;
-let currentColor = { r: 0, g: 0, b: 0 };
-let brushSize = 5;
+let currentColor = { r: 255, g: 255, b: 255 }; // Start with white (milk foam)
+let brushSize = 30; // Max size for foam
+const minBrushSize = 3; // Starting size for foam pour
+let strokeStartTime = 0;
 
 // Helper function to convert hex to RGB
 function hexToRgb(hex) {
@@ -46,15 +48,16 @@ function renderCanvas() {
     ctx.putImageData(imageData, 0, 0);
 }
 
-// Event handlers
+// Event handlers - Latte art foam effect
 function startDrawing(e) {
     isDrawing = true;
+    strokeStartTime = Date.now();
     const rect = canvas.getBoundingClientRect();
     lastX = Math.floor(e.clientX - rect.left);
     lastY = Math.floor(e.clientY - rect.top);
 
-    // Draw initial point
-    paintCanvas.draw_circle(lastX, lastY, Math.floor(brushSize / 2), currentColor.r, currentColor.g, currentColor.b);
+    // Draw initial small point (start of foam pour)
+    paintCanvas.draw_circle(lastX, lastY, Math.floor(minBrushSize / 2), currentColor.r, currentColor.g, currentColor.b);
     renderCanvas();
 }
 
@@ -65,8 +68,21 @@ function draw(e) {
     const x = Math.floor(e.clientX - rect.left);
     const y = Math.floor(e.clientY - rect.top);
 
-    // Draw line from last position to current position
-    paintCanvas.draw_line(lastX, lastY, x, y, currentColor.r, currentColor.g, currentColor.b, brushSize);
+    // Calculate how long this stroke has been going (for foam expansion)
+    const strokeDuration = Date.now() - strokeStartTime;
+    const expansionRate = 1.5; // How fast the foam expands per second
+    const currentMaxSize = Math.min(
+        minBrushSize + (strokeDuration / 1000) * expansionRate * brushSize,
+        brushSize
+    );
+
+    // Draw line with gradient size (foam expanding effect)
+    paintCanvas.draw_line_gradient_size(
+        lastX, lastY, x, y,
+        currentColor.r, currentColor.g, currentColor.b,
+        minBrushSize,
+        Math.floor(currentMaxSize)
+    );
     renderCanvas();
 
     lastX = x;
@@ -91,8 +107,27 @@ brushSizeSlider.addEventListener('input', (e) => {
 });
 
 clearBtn.addEventListener('click', () => {
-    paintCanvas.clear(255, 255, 255);
+    // Clear to espresso brown color
+    paintCanvas.clear(101, 67, 33); // Coffee brown #654321
     renderCanvas();
+});
+
+// Color preset buttons
+document.querySelectorAll('.color-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        // Remove active class from all buttons
+        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+        // Add active class to clicked button
+        e.target.classList.add('active');
+
+        // Set color
+        const color = e.target.getAttribute('data-color');
+        colorPicker.value = color;
+        const rgb = hexToRgb(color);
+        if (rgb) {
+            currentColor = rgb;
+        }
+    });
 });
 
 // Canvas events
@@ -128,7 +163,8 @@ canvas.addEventListener('touchend', (e) => {
     canvas.dispatchEvent(mouseEvent);
 });
 
-// Initial render
+// Initial render with coffee background
+paintCanvas.clear(101, 67, 33); // Start with espresso brown
 renderCanvas();
 
-console.log('🎨 Espresso Paint loaded! WASM is ready.');
+console.log('☕ Espresso Latte Art loaded! WASM is ready.');

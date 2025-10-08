@@ -96,4 +96,61 @@ impl PaintCanvas {
             }
         }
     }
+
+    pub fn draw_line_gradient_size(&mut self, x0: i32, y0: i32, x1: i32, y1: i32, r: u8, g: u8, b: u8, start_size: i32, end_size: i32) {
+        // Bresenham's line algorithm with gradual brush size increase (for latte art foam effect)
+        let dx = (x1 - x0).abs();
+        let dy = -(y1 - y0).abs();
+        let sx = if x0 < x1 { 1 } else { -1 };
+        let sy = if y0 < y1 { 1 } else { -1 };
+        let mut err = dx + dy;
+
+        let mut x = x0;
+        let mut y = y0;
+
+        // Calculate total distance for size interpolation
+        let total_distance = ((dx * dx + dy * dy) as f32).sqrt();
+        let mut current_distance = 0.0;
+
+        loop {
+            // Interpolate brush size based on distance traveled
+            let progress = if total_distance > 0.0 {
+                current_distance / total_distance
+            } else {
+                0.0
+            };
+
+            let current_size = start_size as f32 + (end_size - start_size) as f32 * progress;
+            let brush_radius = (current_size / 2.0) as i32;
+
+            if brush_radius > 0 {
+                self.draw_circle(x, y, brush_radius, r, g, b);
+            } else {
+                self.draw_point(x, y, r, g, b);
+            }
+
+            if x == x1 && y == y1 {
+                break;
+            }
+
+            let e2 = 2 * err;
+            let mut moved = false;
+
+            if e2 >= dy {
+                err += dy;
+                x += sx;
+                moved = true;
+            }
+
+            if e2 <= dx {
+                err += dx;
+                y += sy;
+                moved = true;
+            }
+
+            if moved {
+                current_distance += 1.0;
+            }
+        }
+    }
 }

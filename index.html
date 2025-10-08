@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Espresso Paint</title>
+    <title>Espresso Latte Art</title>
     <style>
         * {
             margin: 0;
@@ -13,27 +13,37 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #f0f0f0;
+            background: linear-gradient(135deg, #6B4423 0%, #3E2723 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 20px;
+            min-height: 100vh;
         }
 
         h1 {
+            margin-bottom: 10px;
+            color: #FFF8E1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            color: #D7CCC8;
             margin-bottom: 20px;
-            color: #333;
+            font-size: 14px;
+            font-style: italic;
         }
 
         .toolbar {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
             padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             margin-bottom: 20px;
             display: flex;
             gap: 15px;
             align-items: center;
+            backdrop-filter: blur(10px);
         }
 
         .toolbar label {
@@ -41,7 +51,8 @@
             align-items: center;
             gap: 8px;
             font-size: 14px;
-            color: #666;
+            color: #5D4037;
+            font-weight: 500;
         }
 
         .toolbar input[type="color"] {
@@ -58,60 +69,113 @@
 
         .toolbar button {
             padding: 8px 16px;
-            background: #007bff;
+            background: #6B4423;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 14px;
-            transition: background 0.2s;
+            transition: all 0.2s;
+            font-weight: 500;
         }
 
         .toolbar button:hover {
-            background: #0056b3;
+            background: #5D4037;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
         #canvas-container {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            padding: 10px;
+            background: linear-gradient(135deg, #EFEBE9 0%, #D7CCC8 100%);
+            border-radius: 50%;
+            box-shadow:
+                0 8px 24px rgba(0,0,0,0.4),
+                inset 0 2px 4px rgba(255,255,255,0.5);
+            padding: 40px;
+            position: relative;
+        }
+
+        #canvas-container::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            width: 80px;
+            height: 40px;
+            background: #D7CCC8;
+            border-radius: 40px 40px 0 0;
+            box-shadow:
+                0 -2px 8px rgba(0,0,0,0.2),
+                inset 0 2px 4px rgba(0,0,0,0.1);
         }
 
         canvas {
-            border: 1px solid #ddd;
+            border: none;
             cursor: crosshair;
             display: block;
+            border-radius: 50%;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.2);
         }
 
         .status {
-            margin-top: 10px;
+            margin-top: 20px;
             font-size: 12px;
-            color: #999;
+            color: #D7CCC8;
+        }
+
+        .color-preset {
+            display: flex;
+            gap: 8px;
+            margin-left: 10px;
+        }
+
+        .color-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #D7CCC8;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .color-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .color-btn.active {
+            border-color: #6B4423;
+            border-width: 3px;
         }
     </style>
 </head>
 <body>
-    <h1>☕ Espresso Paint</h1>
+    <h1>☕ Espresso Latte Art</h1>
+    <div class="subtitle">Pour your milk foam and create beautiful art</div>
 
     <div class="toolbar">
         <label>
-            Color:
-            <input type="color" id="color-picker" value="#000000">
+            Foam Color:
+            <input type="color" id="color-picker" value="#ffffff">
         </label>
+        <div class="color-preset">
+            <button class="color-btn active" style="background: #ffffff" data-color="#ffffff" title="White foam"></button>
+            <button class="color-btn" style="background: #FFF8DC" data-color="#FFF8DC" title="Cream"></button>
+            <button class="color-btn" style="background: #8B4513" data-color="#8B4513" title="Cocoa"></button>
+        </div>
         <label>
-            Brush Size:
-            <input type="range" id="brush-size" min="1" max="50" value="5">
-            <span id="size-value">5</span>px
+            Pour Size:
+            <input type="range" id="brush-size" min="15" max="60" value="30">
+            <span id="size-value">30</span>px
         </label>
-        <button id="clear-btn">Clear Canvas</button>
+        <button id="clear-btn">New Cup</button>
     </div>
 
     <div id="canvas-container">
-        <canvas id="paint-canvas" width="800" height="600"></canvas>
+        <canvas id="paint-canvas" width="600" height="600"></canvas>
     </div>
 
-    <div class="status">WebAssembly Paint App</div>
+    <div class="status">WebAssembly-powered latte art simulator</div>
 
     <script type="module" src="./js/app.js"></script>
 </body>
