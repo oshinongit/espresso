@@ -1,0 +1,13 @@
+# Rust
+wasm-paint/target/
+wasm-paint/Cargo.lock
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
